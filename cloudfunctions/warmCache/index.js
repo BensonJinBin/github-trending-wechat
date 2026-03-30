@@ -8,57 +8,49 @@ const LANGUAGES = [
   'zig', 'lua', 'dart', 'elixir', 'scala', 'html', 'css',
 ]
 const SINCE_LIST = ['daily', 'weekly', 'monthly']
-const BATCH_COUNT = 4
-const BATCH_DELAY_MS = 3000
-
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
-
-// 将语言列表均分为 BATCH_COUNT 批
-function getBatch(batchIndex) {
-  const size = Math.ceil(LANGUAGES.length / BATCH_COUNT)
-  const start = batchIndex * size
-  return LANGUAGES.slice(start, start + size)
-}
 
 exports.main = async (event) => {
-  // 定时触发器通过 trigger name 区分批次
-  // batch0 → 2:00, batch1 → 8:00, batch2 → 14:00, batch3 → 20:00
-  let batchIndex = 0
+  // 根据触发器名称或参数决定预热哪个语言
+  // slot0 ~ slot21，每个 slot 对应一个语言
+  let slot = 0
   if (event.Type === 'Timer') {
     const triggerName = event.TriggerName || ''
-    const match = triggerName.match(/batch(\d+)/)
-    if (match) batchIndex = parseInt(match[1])
-  } else if (event.batch != null) {
-    batchIndex = event.batch
+    const match = triggerName.match(/slot(\d+)/)
+    if (match) slot = parseInt(match[1])
+  } else if (event.slot != null) {
+    slot = event.slot
   }
 
-  const languages = getBatch(batchIndex)
+  if (slot >= LANGUAGES.length) {
+    console.log(`[warmCache] slot ${slot} 超出语言列表范围，跳过`)
+    return { slot, skipped: true }
+  }
+
+  const language = LANGUAGES[slot]
+  const label = language || '全部语言'
+  console.log(`[warmCache] slot ${slot}，预热语言: ${label}`)
+
+  // 3 个时间维度串行调用，避免并发导致超时
   const results = []
-  console.log(`[warmCache] 批次 ${batchIndex}，预热 ${languages.length} 个语言: ${languages.map(l => l || '全部').join(', ')}`)
-
-  for (let i = 0; i < languages.length; i++) {
-    const language = languages[i]
-    const label = language || '全部语言'
-
-    const settled = await Promise.allSettled(
-      SINCE_LIST.map(since =>
-        cloud.callFunction({
-          name: 'getTrending',
-          data: { since, language, forceRefresh: true },
-        })
-      )
-    )
-
-    const ok = settled.filter(r => r.status === 'fulfilled').length
-    const fail = settled.filter(r => r.status === 'rejected').length
-    console.log(`[warmCache] ${label}: ${ok} 成功 ${fail} 失败`)
-    results.push({ language: label, ok, fail })
-
-    if (i < languages.length - 1) {
-      await sleep(BATCH_DELAY_MS)
+  for (const since of SINCE_LIST) {
+    try {
+      await cloud.callFunction({
+        name: 'getTrending',
+        data: { since, language, forceRefresh: true },
+      })
+      results.push({ status: 'fulfilled' })
+    } catch (e) {
+      results.push({ status: 'rejected', reason: e })
     }
   }
+  const settled = results
 
-  console.log(`[warmCache] 批次 ${batchIndex} 完成`, JSON.stringify(results))
-  return { batch: batchIndex, results }
+  const ok = settled.filter(r => r.status === 'fulfilled').length
+  const fail = settled.filter(r => r.status === 'rejected').length
+  const errors = settled
+    .filter(r => r.status === 'rejected')
+    .map(r => r.reason?.message || String(r.reason))
+
+  console.log(`[warmCache] ${label}: ${ok} 成功 ${fail} 失败`, fail ? errors : '')
+  return { slot, language: label, ok, fail }
 }

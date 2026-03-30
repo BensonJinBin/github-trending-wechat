@@ -1,24 +1,26 @@
 {
   "triggers": [
-    {
-      "name": "batch0",
-      "type": "timer",
-      "config": "0 0 2 * * * *"
-    },
-    {
-      "name": "batch1",
-      "type": "timer",
-      "config": "0 0 8 * * * *"
-    },
-    {
-      "name": "batch2",
-      "type": "timer",
-      "config": "0 0 14 * * * *"
-    },
-    {
-      "name": "batch3",
-      "type": "timer",
-      "config": "0 0 20 * * * *"
-    }
+    { "name": "slot0",  "type": "timer", "config": "0 0 7 * * * *" },
+    { "name": "slot1",  "type": "timer", "config": "0 5 7 * * * *" },
+    { "name": "slot2",  "type": "timer", "config": "0 10 7 * * * *" },
+    { "name": "slot3",  "type": "timer", "config": "0 15 7 * * * *" },
+    { "name": "slot4",  "type": "timer", "config": "0 20 7 * * * *" },
+    { "name": "slot5",  "type": "timer", "config": "0 0 8 * * * *" },
+    { "name": "slot6",  "type": "timer", "config": "0 5 8 * * * *" },
+    { "name": "slot7",  "type": "timer", "config": "0 0 10 * * * *" },
+    { "name": "slot8",  "type": "timer", "config": "0 0 11 * * * *" },
+    { "name": "slot9",  "type": "timer", "config": "0 0 12 * * * *" },
+    { "name": "slot10", "type": "timer", "config": "0 0 13 * * * *" },
+    { "name": "slot11", "type": "timer", "config": "0 0 14 * * * *" },
+    { "name": "slot12", "type": "timer", "config": "0 0 15 * * * *" },
+    { "name": "slot13", "type": "timer", "config": "0 0 16 * * * *" },
+    { "name": "slot14", "type": "timer", "config": "0 0 17 * * * *" },
+    { "name": "slot15", "type": "timer", "config": "0 0 18 * * * *" },
+    { "name": "slot16", "type": "timer", "config": "0 0 19 * * * *" },
+    { "name": "slot17", "type": "timer", "config": "0 0 20 * * * *" },
+    { "name": "slot18", "type": "timer", "config": "0 0 21 * * * *" },
+    { "name": "slot19", "type": "timer", "config": "0 0 22 * * * *" },
+    { "name": "slot20", "type": "timer", "config": "0 30 9 * * * *" },
+    { "name": "slot21", "type": "timer", "config": "0 30 14 * * * *" }
   ]
 }

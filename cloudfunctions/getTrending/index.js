@@ -29,17 +29,29 @@ async function translateBatch(texts) {
       profile: {},
     })
 
-    const result = await client.TextTranslateBatch({
-      Source: 'auto',
-      Target: 'zh',
-      ProjectId: 0,
-      SourceTextList: toTranslate,
+    // SDK 无 TextTranslateBatch，逐条并发调用 TextTranslate
+    const results = await Promise.allSettled(
+      toTranslate.map(text =>
+        client.TextTranslate({
+          SourceText: text,
+          Source: 'auto',
+          Target: 'zh',
+          ProjectId: 0,
+        })
+      )
+    )
+
+    const translatedMap = new Map()
+    toTranslate.forEach((text, i) => {
+      const r = results[i]
+      if (r.status === 'fulfilled' && r.value?.TargetText) {
+        translatedMap.set(text, r.value.TargetText)
+      }
     })
 
-    let idx = 0
     return texts.map(t => {
       if (!t || !t.trim()) return t
-      return result.TargetTextList[idx++] || t
+      return translatedMap.get(t) || t
     })
   } catch (e) {
     console.error('翻译失败，返回原文', e.message)
@@ -116,17 +128,20 @@ exports.main = async (event) => {
   const langPath = language ? `/${language}` : ''
   const url = `https://github.com/trending${langPath}?since=${since}`
 
+  console.log(`[getTrending] 开始爬取: ${url}`)
   const response = await fetch(url, {
     headers: {
       'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
       'Accept-Language': 'en-US,en;q=0.9',
       'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
     },
+    timeout: 15000,
   })
 
   if (!response.ok) throw new Error(`GitHub 返回 ${response.status}`)
 
   const html = await response.text()
+  console.log(`[getTrending] 爬取完成，HTML 长度: ${html.length}`)
   const $ = cheerio.load(html)
   const repos = []
 
@@ -176,11 +191,14 @@ exports.main = async (event) => {
   })
 
   // 4. 批量翻译描述
+  console.log(`[getTrending] 开始翻译 ${repos.length} 条描述`)
   const descriptions = repos.map(r => r.description)
   const translated = await translateBatch(descriptions)
   repos.forEach((r, i) => { r.description = translated[i] })
+  console.log(`[getTrending] 翻译完成`)
 
   // 5. 并发补充 GitHub API 数据
+  console.log(`[getTrending] 开始补充 GitHub API 数据`)
   const enriched = await Promise.allSettled(repos.map(r => enrichRepo(r.owner, r.repo)))
   repos.forEach((r, i) => {
     const result = enriched[i]
