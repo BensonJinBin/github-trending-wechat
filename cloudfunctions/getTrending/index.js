@@ -5,8 +5,8 @@ const fetch = require('node-fetch')
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 
 const db = cloud.database()
-const TRENDING_TTL = 60 * 60 * 1000  // 1 小时
-const ENRICH_TTL = 60 * 60 * 1000    // 1 小时
+const TRENDING_TTL = 6 * 60 * 60 * 1000  // 6 小时
+const ENRICH_TTL = 24 * 60 * 60 * 1000   // 24 小时
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN
 const TENCENT_SECRET_ID = process.env.TENCENT_SECRET_ID
@@ -30,7 +30,7 @@ async function translateBatch(texts) {
     })
 
     const result = await client.TextTranslateBatch({
-      Source: 'en',
+      Source: 'auto',
       Target: 'zh',
       ProjectId: 0,
       SourceTextList: toTranslate,
@@ -96,17 +96,20 @@ async function enrichRepo(owner, repo) {
 exports.main = async (event) => {
   const since = event.since || 'daily'
   const language = event.language || ''
+  const forceRefresh = event.forceRefresh || false
   const cacheKey = `${since}-${language || 'all'}`
 
-  // 1. 读 trending_cache
-  try {
-    const doc = await db.collection('trending_cache').doc(cacheKey).get()
-    if (doc.data && doc.data.expireAt > Date.now()) {
-      console.log(`缓存命中: ${cacheKey}`)
-      return doc.data.payload
+  // 1. 读 trending_cache（forceRefresh 时跳过）
+  if (!forceRefresh) {
+    try {
+      const doc = await db.collection('trending_cache').doc(cacheKey).get()
+      if (doc.data && doc.data.expireAt > Date.now()) {
+        console.log(`缓存命中: ${cacheKey}`)
+        return doc.data.payload
+      }
+    } catch (_) {
+      // 文档不存在，继续爬取
     }
-  } catch (_) {
-    // 文档不存在，继续爬取
   }
 
   // 2. 爬取 GitHub Trending
@@ -127,7 +130,7 @@ exports.main = async (event) => {
   const $ = cheerio.load(html)
   const repos = []
 
-  // 3. 解析 HTML（与 server.js:102-154 一致）
+  // 3. 解析 HTML
   $('article.Box-row').each((i, el) => {
     const $el = $(el)
 
@@ -188,9 +191,13 @@ exports.main = async (event) => {
 
   // 6. 写 trending_cache
   const payload = { repos, since, language, updatedAt: new Date().toISOString() }
-  await db.collection('trending_cache').doc(cacheKey).set({
-    data: { payload, expireAt: Date.now() + TRENDING_TTL },
-  })
+  try {
+    await db.collection('trending_cache').doc(cacheKey).set({
+      data: { payload, expireAt: Date.now() + TRENDING_TTL },
+    })
+  } catch (e) {
+    console.error(`缓存写入失败: ${cacheKey}`, e.message)
+  }
 
   return payload
 }

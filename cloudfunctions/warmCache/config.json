@@ -1,0 +1,24 @@
+{
+  "triggers": [
+    {
+      "name": "batch0",
+      "type": "timer",
+      "config": "0 0 2 * * * *"
+    },
+    {
+      "name": "batch1",
+      "type": "timer",
+      "config": "0 0 8 * * * *"
+    },
+    {
+      "name": "batch2",
+      "type": "timer",
+      "config": "0 0 14 * * * *"
+    },
+    {
+      "name": "batch3",
+      "type": "timer",
+      "config": "0 0 20 * * * *"
+    }
+  ]
+}

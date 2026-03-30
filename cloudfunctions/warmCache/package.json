@@ -1,0 +1,9 @@
+{
+  "name": "warmCache",
+  "version": "1.0.0",
+  "description": "定时预热 GitHub Trending 缓存",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

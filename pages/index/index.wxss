@@ -27,7 +27,8 @@
   font-size: 28rpx;
 }
 
-.error-icon {
+.error-icon,
+.empty-icon {
   font-size: 80rpx;
 }
 

@@ -22,6 +22,12 @@
     </view>
   </view>
 
+  <!-- 空状态 -->
+  <view wx:elif="{{!loading && !repos.length}}" class="status-view">
+    <text class="empty-icon">📭</text>
+    <text class="status-text">该语言暂无热门项目</text>
+  </view>
+
   <!-- 仓库列表 -->
   <scroll-view
     wx:elif="{{repos.length}}"
