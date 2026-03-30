@@ -2,6 +2,8 @@ const cloud = require('../../utils/cloud')
 const storage = require('../../utils/storage')
 
 Page({
+  _requestId: 0,
+
   data: {
     repos: [],
     since: 'daily',
@@ -38,22 +40,25 @@ Page({
   },
 
   async loadTrending() {
+    const requestId = ++this._requestId
     this.setData({ loading: true, error: null })
     try {
       const result = await cloud.callFunction('getTrending', {
         since: this.data.since,
         language: this.data.language,
       })
+      if (requestId !== this._requestId) return // 已有更新的请求，丢弃
       const t = new Date(result.updatedAt)
       const pad = n => String(n).padStart(2, '0')
-      const timeStr = `${pad(t.getHours())}:${pad(t.getMinutes())}`
+      const timeStr = isNaN(t.getTime()) ? '' : `${pad(t.getHours())}:${pad(t.getMinutes())}`
       this.setData({
         repos: result.repos,
-        updatedAt: `更新于 ${timeStr}`,
+        updatedAt: timeStr ? `更新于 ${timeStr}` : '',
         loading: false,
         refreshing: false,
       })
     } catch (err) {
+      if (requestId !== this._requestId) return
       console.error('加载失败', err)
       this.setData({
         error: '加载失败，请重试',
