@@ -1,10 +1,11 @@
 const cloud = require('wx-server-sdk')
 const cheerio = require('cheerio')
+const fetch = require('node-fetch')
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 
 const db = cloud.database()
-const TRENDING_TTL = 5 * 60 * 1000   // 5 分钟
+const TRENDING_TTL = 60 * 60 * 1000  // 1 小时
 const ENRICH_TTL = 60 * 60 * 1000    // 1 小时
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN

@@ -31,8 +31,10 @@ Page({
   },
 
   onLanguageChange(e) {
-    this.setData({ language: e.detail.language })
-    storage.set('filters', { since: this.data.since, language: e.detail.language })
+    const language = e.detail.language
+    this.setData({ language })
+    storage.set('filters', { since: this.data.since, language })
+    this._saveRecentLanguage(language)
     this.loadTrending()
   },
 
@@ -52,6 +54,7 @@ Page({
         loading: false,
         refreshing: false,
       })
+      this._prefetchRelated()
     } catch (err) {
       console.error('加载失败', err)
       this.setData({
@@ -60,6 +63,32 @@ Page({
         refreshing: false,
       })
     }
+  },
+
+  _prefetchRelated() {
+    const allSince = ['daily', 'weekly', 'monthly']
+    const currentLang = this.data.language
+
+    // 预热当前语言的其他两个时间维度
+    allSince.filter(s => s !== this.data.since).forEach(since => {
+      cloud.callFunction('getTrending', { since, language: currentLang }).catch(() => {})
+    })
+
+    // 预热最近使用语言的全部时间维度
+    const recentLangs = (storage.get('recentLanguages') || []).filter(l => l !== currentLang)
+    recentLangs.forEach(language => {
+      allSince.forEach(since => {
+        cloud.callFunction('getTrending', { since, language }).catch(() => {})
+      })
+    })
+  },
+
+  _saveRecentLanguage(lang) {
+    if (!lang) return
+    const MAX = 4
+    const list = (storage.get('recentLanguages') || []).filter(l => l !== lang)
+    list.unshift(lang)
+    storage.set('recentLanguages', list.slice(0, MAX))
   },
 
   onRefresh() {

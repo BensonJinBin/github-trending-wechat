@@ -5,7 +5,8 @@
   "main": "index.js",
   "dependencies": {
     "wx-server-sdk": "~2.6.3",
-    "cheerio": "^1.0.0",
+    "cheerio": "1.0.0-rc.12",
+    "node-fetch": "^2.7.0",
     "tencentcloud-sdk-nodejs-tmt": "^4.0.0"
   }
 }

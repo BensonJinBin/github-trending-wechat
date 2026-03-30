@@ -1,9 +1,12 @@
 /**
- * wx.cloud.callFunction 的 Promise 封装
+ * 使用跨账号云环境的 callFunction 封装
  */
-const callFunction = (name, data) => {
+const callFunction = async (name, data) => {
+  const app = getApp()
+  await app.globalData.cloudReady
+  const cloud = app.globalData.cloud
   return new Promise((resolve, reject) => {
-    wx.cloud.callFunction({
+    cloud.callFunction({
       name,
       data,
       success: res => resolve(res.result),
