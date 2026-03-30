@@ -1,0 +1,57 @@
+/* 亮色主题 CSS 变量 */
+page {
+  --bg: #ffffff;
+  --bg2: #f6f8fa;
+  --bg3: #eaeef2;
+  --border: #d0d7de;
+  --text: #1f2328;
+  --text2: #656d76;
+  --text3: #8c959f;
+  --accent: #0969da;
+  --green: #1a7f37;
+  --red: #cf222e;
+  --radius: 16rpx;
+  --card-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
+
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
+  font-size: 28rpx;
+  line-height: 1.6;
+}
+
+/* 暗色主题（跟随系统） */
+@media (prefers-color-scheme: dark) {
+  page {
+    --bg: #0d1117;
+    --bg2: #161b22;
+    --bg3: #21262d;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text2: #8b949e;
+    --text3: #6e7681;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --card-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* 全局重置 */
+view, text, image {
+  box-sizing: border-box;
+}
+
+button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-size: inherit;
+  color: inherit;
+  line-height: inherit;
+}
+
+button::after {
+  border: none;
+}

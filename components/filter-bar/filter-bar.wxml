@@ -1,0 +1,29 @@
+<view class="filter-bar">
+  <!-- 时间段切换 -->
+  <view class="period-group">
+    <view
+      wx:for="{{periods}}"
+      wx:key="value"
+      class="period-btn {{since === item.value ? 'period-btn--active' : ''}}"
+      bindtap="onPeriodTap"
+      data-value="{{item.value}}"
+      hover-class="period-btn--hover"
+      hover-stay-time="100"
+    >
+      <text>{{item.label}}</text>
+    </view>
+  </view>
+
+  <!-- 语言筛选 -->
+  <picker
+    mode="selector"
+    range="{{languageLabels}}"
+    value="{{languageIndex}}"
+    bindchange="onLanguagePick"
+  >
+    <view class="lang-picker">
+      <text class="lang-picker-text">{{currentLanguageLabel}}</text>
+      <text class="lang-picker-chevron">▾</text>
+    </view>
+  </picker>
+</view>

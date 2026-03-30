@@ -1,0 +1,73 @@
+<view class="card" bindtap="onTap" hover-class="card--pressed" hover-stay-time="150">
+  <!-- 头部：排名 + 仓库名 + 新增 star -->
+  <view class="card-header">
+    <text class="rank">#{{repo.rank}}</text>
+    <view class="repo-name-wrap">
+      <text class="owner">{{repo.owner}}</text>
+      <text class="separator"> / </text>
+      <text class="repo-name">{{repo.repo}}</text>
+    </view>
+    <view wx:if="{{starsAddedLabel}}" class="stars-added">
+      <text>{{starsAddedLabel}}</text>
+    </view>
+  </view>
+
+  <!-- 描述 -->
+  <text wx:if="{{repo.description}}" class="description">{{repo.description}}</text>
+
+  <!-- Topics -->
+  <view wx:if="{{repo.topics && repo.topics.length}}" class="topics">
+    <view
+      wx:for="{{repo.topics}}"
+      wx:key="*this"
+      wx:if="{{index < 5}}"
+      class="topic-tag"
+    >
+      <text>{{item}}</text>
+    </view>
+  </view>
+
+  <!-- 底部元信息 -->
+  <view class="card-footer">
+    <!-- 编程语言 -->
+    <view wx:if="{{repo.language}}" class="meta-item">
+      <view class="lang-dot" style="background-color: {{repo.langColor}}"></view>
+      <text>{{repo.language}}</text>
+    </view>
+    <!-- Stars -->
+    <view class="meta-item">
+      <text class="meta-icon">⭐</text>
+      <text>{{repo.starsFormatted}}</text>
+    </view>
+    <!-- Forks -->
+    <view class="meta-item">
+      <text class="meta-icon">🍴</text>
+      <text>{{repo.forksFormatted}}</text>
+    </view>
+    <!-- Open Issues -->
+    <view wx:if="{{repo.openIssues != null}}" class="meta-item">
+      <text class="meta-icon">●</text>
+      <text>{{repo.openIssues}} issues</text>
+    </view>
+    <!-- License -->
+    <view wx:if="{{repo.license}}" class="meta-item license">
+      <text>{{repo.license}}</text>
+    </view>
+    <!-- 最近推送 -->
+    <view wx:if="{{pushedLabel}}" class="meta-item push-time">
+      <text>{{pushedLabel}}</text>
+    </view>
+  </view>
+
+  <!-- 贡献者头像 -->
+  <view wx:if="{{repo.contributors && repo.contributors.length}}" class="contributors">
+    <image
+      wx:for="{{repo.contributors}}"
+      wx:key="*this"
+      src="{{item}}"
+      class="avatar"
+      mode="aspectFill"
+      lazy-load
+    />
+  </view>
+</view>

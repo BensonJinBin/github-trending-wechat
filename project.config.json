@@ -1,0 +1,45 @@
+{
+  "appid": "wx02f0dea7b1e25859",
+  "projectname": "github-trending-wechat",
+  "description": "GitHub Trending 微信小程序",
+  "compileType": "miniprogram",
+  "libVersion": "3.4.0",
+  "cloudfunctionRoot": "cloudfunctions/",
+  "setting": {
+    "es6": true,
+    "enhance": true,
+    "minified": true,
+    "minifyWXSS": true,
+    "ignoreUploadUnusedFiles": true,
+    "uploadWithSourceMap": true,
+    "checkSiteMap": false,
+    "useMultiFrameRuntime": true,
+    "useApiHook": true,
+    "useDevtools": true,
+    "postcss": false,
+    "compileWorklet": false,
+    "uglifyFileName": false,
+    "packNpmManually": false,
+    "packNpmRelationList": [],
+    "minifyWXML": true,
+    "localPlugins": false,
+    "disableUseStrict": false,
+    "useCompilerPlugins": false,
+    "condition": false,
+    "swc": false,
+    "disableSWC": true,
+    "babelSetting": {
+      "ignore": [],
+      "disablePlugins": [],
+      "outputPath": ""
+    }
+  },
+  "condition": {},
+  "simulatorPluginLibVersion": {},
+  "packOptions": {
+    "ignore": [],
+    "include": []
+  },
+  "editorSetting": {},
+  "cloudfunctionTemplateRoot": "cloudfunctionTemplate/"
+}

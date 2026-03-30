@@ -1,0 +1,44 @@
+<view class="container">
+  <!-- 筛选栏（吸顶） -->
+  <filter-bar
+    since="{{since}}"
+    language="{{language}}"
+    bind:sinceChange="onSinceChange"
+    bind:languageChange="onLanguageChange"
+  />
+
+  <!-- 加载中 -->
+  <view wx:if="{{loading && !refreshing}}" class="status-view">
+    <view class="spinner" />
+    <text class="status-text">加载中...</text>
+  </view>
+
+  <!-- 错误 -->
+  <view wx:elif="{{error}}" class="status-view">
+    <text class="error-icon">⚠️</text>
+    <text class="status-text">{{error}}</text>
+    <view class="retry-btn" bindtap="onRetry">
+      <text>重新加载</text>
+    </view>
+  </view>
+
+  <!-- 仓库列表 -->
+  <scroll-view
+    wx:elif="{{repos.length}}"
+    scroll-y
+    class="repo-list"
+    refresher-enabled
+    refresher-triggered="{{refreshing}}"
+    bind:refresherrefresh="onRefresh"
+  >
+    <repo-card
+      wx:for="{{repos}}"
+      wx:key="fullName"
+      repo="{{item}}"
+      since="{{since}}"
+    />
+    <view class="list-footer">
+      <text>共 {{repos.length}} 个项目 · {{updatedAt}}</text>
+    </view>
+  </scroll-view>
+</view>

@@ -1,0 +1,159 @@
+.card {
+  margin: 16rpx 24rpx;
+  padding: 28rpx 32rpx;
+  background-color: var(--bg);
+  border-radius: var(--radius);
+  box-shadow: var(--card-shadow);
+  border: 1rpx solid var(--border);
+  transition: opacity 0.15s;
+}
+
+.card--pressed {
+  opacity: 0.75;
+}
+
+/* 头部 */
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12rpx;
+  margin-bottom: 16rpx;
+  flex-wrap: wrap;
+}
+
+.rank {
+  color: var(--text3);
+  font-size: 24rpx;
+  min-width: 48rpx;
+  padding-top: 4rpx;
+}
+
+.repo-name-wrap {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+}
+
+.owner {
+  color: var(--text2);
+  font-size: 28rpx;
+}
+
+.separator {
+  color: var(--text3);
+  font-size: 28rpx;
+}
+
+.repo-name {
+  color: var(--accent);
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.stars-added {
+  background-color: var(--bg3);
+  border-radius: 8rpx;
+  padding: 4rpx 12rpx;
+}
+
+.stars-added text {
+  color: var(--green);
+  font-size: 22rpx;
+  font-weight: 500;
+}
+
+/* 描述 */
+.description {
+  display: block;
+  color: var(--text2);
+  font-size: 26rpx;
+  line-height: 1.6;
+  margin-bottom: 20rpx;
+}
+
+/* Topics */
+.topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-bottom: 20rpx;
+}
+
+.topic-tag {
+  background-color: var(--bg3);
+  border-radius: 200rpx;
+  padding: 4rpx 18rpx;
+}
+
+.topic-tag text {
+  color: var(--accent);
+  font-size: 22rpx;
+}
+
+/* 元信息行 */
+.card-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20rpx;
+  align-items: center;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  color: var(--text2);
+  font-size: 24rpx;
+}
+
+.meta-icon {
+  font-size: 22rpx;
+}
+
+/* 语言点 */
+.lang-dot {
+  width: 20rpx;
+  height: 20rpx;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* License badge */
+.license text {
+  background-color: var(--bg3);
+  border-radius: 6rpx;
+  padding: 2rpx 10rpx;
+  font-size: 22rpx;
+}
+
+/* 推送时间（靠右） */
+.push-time {
+  margin-left: auto;
+}
+
+.push-time text {
+  color: var(--text3);
+  font-size: 22rpx;
+}
+
+/* 贡献者头像 */
+.contributors {
+  display: flex;
+  flex-direction: row;
+  margin-top: 24rpx;
+  gap: 0;
+}
+
+.avatar {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  border: 3rpx solid var(--bg);
+  margin-left: -10rpx;
+  background-color: var(--bg3);
+}
+
+.avatar:first-child {
+  margin-left: 0;
+}

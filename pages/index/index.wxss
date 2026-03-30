@@ -1,0 +1,67 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: var(--bg2);
+}
+
+/* 仓库列表 */
+.repo-list {
+  flex: 1;
+  height: 0; /* 让 scroll-view 在 flex 中正确撑满 */
+}
+
+/* 状态视图（loading / error） */
+.status-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80rpx 40rpx;
+  gap: 24rpx;
+}
+
+.status-text {
+  color: var(--text2);
+  font-size: 28rpx;
+}
+
+.error-icon {
+  font-size: 80rpx;
+}
+
+/* 加载动画 */
+.spinner {
+  width: 60rpx;
+  height: 60rpx;
+  border: 6rpx solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* 重试按钮 */
+.retry-btn {
+  margin-top: 8rpx;
+  padding: 16rpx 48rpx;
+  background-color: var(--accent);
+  border-radius: var(--radius);
+}
+
+.retry-btn text {
+  color: #ffffff;
+  font-size: 28rpx;
+}
+
+/* 列表底部 */
+.list-footer {
+  padding: 32rpx;
+  text-align: center;
+  color: var(--text3);
+  font-size: 24rpx;
+}

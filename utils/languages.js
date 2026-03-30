@@ -1,0 +1,26 @@
+const LANGUAGES = [
+  { value: '', label: '全部语言' },
+  { value: 'python', label: 'Python' },
+  { value: 'javascript', label: 'JavaScript' },
+  { value: 'typescript', label: 'TypeScript' },
+  { value: 'go', label: 'Go' },
+  { value: 'rust', label: 'Rust' },
+  { value: 'java', label: 'Java' },
+  { value: 'c++', label: 'C++' },
+  { value: 'c', label: 'C' },
+  { value: 'c#', label: 'C#' },
+  { value: 'shell', label: 'Shell' },
+  { value: 'swift', label: 'Swift' },
+  { value: 'kotlin', label: 'Kotlin' },
+  { value: 'ruby', label: 'Ruby' },
+  { value: 'php', label: 'PHP' },
+  { value: 'zig', label: 'Zig' },
+  { value: 'lua', label: 'Lua' },
+  { value: 'dart', label: 'Dart' },
+  { value: 'elixir', label: 'Elixir' },
+  { value: 'scala', label: 'Scala' },
+  { value: 'html', label: 'HTML' },
+  { value: 'css', label: 'CSS' },
+]
+
+module.exports = { LANGUAGES }
