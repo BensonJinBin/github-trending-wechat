@@ -12,6 +12,8 @@ const GITHUB_TOKEN = process.env.GITHUB_TOKEN
 const TENCENT_SECRET_ID = process.env.TENCENT_SECRET_ID
 const TENCENT_SECRET_KEY = process.env.TENCENT_SECRET_KEY
 
+if (!GITHUB_TOKEN) console.warn('[getTrending] GITHUB_TOKEN 未配置，使用未认证 GitHub API（限 60 次/小时）')
+
 // ——————————————————————————————————————————
 // 翻译（腾讯翻译君）
 // ——————————————————————————————————————————
@@ -29,17 +31,17 @@ async function translateBatch(texts) {
       profile: {},
     })
 
-    // SDK 无 TextTranslateBatch，逐条并发调用 TextTranslate
-    const results = await Promise.allSettled(
-      toTranslate.map(text =>
-        client.TextTranslate({
-          SourceText: text,
-          Source: 'auto',
-          Target: 'zh',
-          ProjectId: 0,
-        })
+    // SDK 无 TextTranslateBatch，限速 5 QPS 顺序调用（免费版限制）
+    const CHUNK = 5
+    const results = []
+    for (let i = 0; i < toTranslate.length; i += CHUNK) {
+      const batch = toTranslate.slice(i, i + CHUNK).map(text =>
+        client.TextTranslate({ SourceText: text, Source: 'auto', Target: 'zh', ProjectId: 0 })
+          .then(v => ({ status: 'fulfilled', value: v }))
+          .catch(e => ({ status: 'rejected', reason: e }))
       )
-    )
+      results.push(...await Promise.all(batch))
+    }
 
     const translatedMap = new Map()
     toTranslate.forEach((text, i) => {
@@ -63,7 +65,7 @@ async function translateBatch(texts) {
 // GitHub API 补充数据（topics / license / issues / pushedAt）
 // ——————————————————————————————————————————
 async function enrichRepo(owner, repo) {
-  const cacheKey = `${owner}/${repo}`
+  const cacheKey = `${owner}__${repo}`  // 用 __ 替代 /，云数据库 doc ID 不允许 /
 
   // 查 enrich_cache
   try {
@@ -106,7 +108,8 @@ async function enrichRepo(owner, repo) {
 // 主函数
 // ——————————————————————————————————————————
 exports.main = async (event) => {
-  const since = event.since || 'daily'
+  const VALID_SINCE = ['daily', 'weekly', 'monthly']
+  const since = VALID_SINCE.includes(event.since) ? event.since : 'daily'
   const language = event.language || ''
   const forceRefresh = event.forceRefresh || false
   // encodeURIComponent 处理 c#、c++ 等含特殊字符的语言名，用于 DB key 和 URL
