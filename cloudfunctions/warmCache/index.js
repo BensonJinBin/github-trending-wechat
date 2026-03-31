@@ -30,17 +30,26 @@ exports.main = async (event) => {
   const label = language || '全部语言'
   console.log(`[warmCache] slot ${slot}，预热语言: ${label}`)
 
-  // 3 个时间维度串行调用，避免并发导致超时
+  const delay = ms => new Promise(r => setTimeout(r, ms))
+
+  // 3 个时间维度串行调用，失败后间隔 3 秒重试一次
   const results = []
   for (const since of SINCE_LIST) {
-    try {
-      await cloud.callFunction({
-        name: 'getTrending',
-        data: { since, language, forceRefresh: true },
-      })
-      results.push({ status: 'fulfilled' })
-    } catch (e) {
-      results.push({ status: 'rejected', reason: e })
+    let ok = false
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        if (attempt > 0) await delay(3000)
+        await cloud.callFunction({
+          name: 'getTrending',
+          data: { since, language, forceRefresh: true },
+        })
+        results.push({ status: 'fulfilled' })
+        ok = true
+        break
+      } catch (e) {
+        if (attempt === 1) results.push({ status: 'rejected', reason: e })
+        else console.log(`[warmCache] ${label} ${since} 失败，3 秒后重试`)
+      }
     }
   }
   const settled = results
