@@ -5,7 +5,7 @@ const fetch = require('node-fetch')
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 
 const db = cloud.database()
-const TRENDING_TTL = 6 * 60 * 60 * 1000  // 6 小时
+const TRENDING_TTL = 24 * 60 * 60 * 1000  // 24 小时（每天预热一次，撑满全天）
 const ENRICH_TTL = 24 * 60 * 60 * 1000   // 24 小时
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN
@@ -109,7 +109,9 @@ exports.main = async (event) => {
   const since = event.since || 'daily'
   const language = event.language || ''
   const forceRefresh = event.forceRefresh || false
-  const cacheKey = `${since}-${language || 'all'}`
+  // encodeURIComponent 处理 c#、c++ 等含特殊字符的语言名，用于 DB key 和 URL
+  const languageEncoded = language ? encodeURIComponent(language) : ''
+  const cacheKey = `${since}-${languageEncoded || 'all'}`
 
   // 1. 读 trending_cache（forceRefresh 时跳过）
   if (!forceRefresh) {
@@ -125,7 +127,7 @@ exports.main = async (event) => {
   }
 
   // 2. 爬取 GitHub Trending
-  const langPath = language ? `/${language}` : ''
+  const langPath = languageEncoded ? `/${languageEncoded}` : ''
   const url = `https://github.com/trending${langPath}?since=${since}`
 
   console.log(`[getTrending] 开始爬取: ${url}`)
