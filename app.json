@@ -1,11 +1,12 @@
 {
   "pages": [
+    "pages/travel-map/travel-map",
     "pages/index/index"
   ],
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#ffffff",
-    "navigationBarTitleText": "GitHub Trending",
+    "navigationBarTitleText": "有点意思",
     "navigationBarTextStyle": "black"
   },
   "darkmode": true,

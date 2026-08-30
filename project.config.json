@@ -1,7 +1,7 @@
 {
   "appid": "wx02f0dea7b1e25859",
-  "projectname": "github-trending-wechat",
-  "description": "GitHub Trending 微信小程序",
+  "projectname": "有点意思",
+  "description": "有点意思 —— 小玩意合集，第一个是点亮旅行地图",
   "compileType": "miniprogram",
   "libVersion": "3.4.0",
   "cloudfunctionRoot": "cloudfunctions/",
@@ -34,12 +34,30 @@
       "outputPath": ""
     }
   },
-  "condition": {},
+  "condition": {
+    "miniprogram": {
+      "list": [
+        {
+          "name": "旅行地图",
+          "pathName": "pages/travel-map/travel-map",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        }
+      ]
+    }
+  },
   "simulatorPluginLibVersion": {},
   "packOptions": {
     "ignore": [],
-    "include": []
+    "include": [
+      {
+        "value": "pages/travel-map/mpcode.png",
+        "type": "file"
+      }
+    ]
   },
   "editorSetting": {},
-  "cloudfunctionTemplateRoot": "cloudfunctionTemplate/"
+  "cloudfunctionTemplateRoot": "cloudfunctionTemplate/",
+  "isGameTourist": false
 }

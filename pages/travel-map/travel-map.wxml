@@ -1,0 +1,84 @@
+<!-- 主题类挂在根节点上，CSS 变量往下级联；固定定位的子节点也吃得到 -->
+<view class="root {{tier}}">
+
+<view
+  wx:if="{{canBack}}"
+  class="navback"
+  style="top:{{menuTop}}px;height:{{menuH}}px;line-height:{{menuH}}px"
+  bindtap="onBack"
+>‹</view>
+
+<view class="app" style="padding-top:{{navPad}}px">
+  <view class="masthead">
+    <view class="title">点亮我的旅行地图</view>
+    <view class="kicker">点地图，或点下方按钮，点亮你去过的地方</view>
+  </view>
+
+  <view class="scoreboard">
+    <view class="score-row">点亮 <text class="score-num">{{count}}</text> 个省</view>
+    <view class="score-sub">覆盖国土面积 <text class="score-area">{{areaPct}}%</text></view>
+    <view class="hairline"></view>
+    <view class="score-egg">超过全国 <text class="score-egg-num">{{peoplePct}}%</text> 的人 <text class="mark">✦</text></view>
+  </view>
+
+  <!-- 左右出血到屏幕边缘，地图才够大 -->
+  <view class="mapwrap">
+    <canvas
+      type="2d"
+      id="map"
+      class="map"
+      style="width:{{mapW}}px;height:{{mapH}}px"
+      bindtouchstart="onMapTouchStart"
+      bindtouchend="onMapTouchEnd"
+    ></canvas>
+  </view>
+
+  <view class="grid">
+    <view
+      wx:for="{{chips}}"
+      wx:key="id"
+      class="chip {{litMap[item.id] ? 'on' : ''}}"
+      data-id="{{item.id}}"
+      bindtap="onChipTap"
+    >{{item.name}}</view>
+  </view>
+
+  <view class="actions">
+    <view class="btn primary" bindtap="onExport">生成图片</view>
+    <view class="btn" bindtap="onClear">清空</view>
+  </view>
+
+  <view class="note">
+    <view>省界数据来自阿里 DataV.GeoAtlas，含 34 个省级行政区与南海诸岛。</view>
+    <view>国土面积覆盖率按各省公布陆地面积计算；「超过全国 X% 的人」为趣味估算，非统计数据。</view>
+  </view>
+</view>
+
+<!-- 出图预览 -->
+<view class="sheet" wx:if="{{sheetOpen}}" bindtap="onCloseSheet">
+  <image
+    class="shot"
+    src="{{posterPath}}"
+    mode="aspectFit"
+    show-menu-by-longpress
+    catchtap="onSheetStop"
+  ></image>
+  <view class="tip" catchtap="onSheetStop">长按图片可直接发给朋友，或存到相册再发朋友圈</view>
+  <view class="sheet-actions" catchtap="onSheetStop">
+    <view class="btn primary" bindtap="onSave">保存到相册</view>
+    <view class="btn" bindtap="onCloseSheet">关闭</view>
+  </view>
+</view>
+
+<!-- 出图用的画布。离屏 canvas 不能喂给 canvasToTempFilePath，
+     只能放一个真实节点挪到屏幕外 -->
+<canvas
+  type="2d"
+  id="poster"
+  class="poster"
+  style="width:{{posterW}}px;height:{{posterH}}px"
+></canvas>
+
+<view class="toast {{toastShow ? 'show' : ''}}">{{toastText}}</view>
+
+</view>

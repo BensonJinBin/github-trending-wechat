@@ -1,0 +1,323 @@
+/* 这一页是固定深色，不跟随系统主题，也不用 app.wxss 那套 GitHub 配色。
+   page 选择器在页面样式里优先级高于全局，直接盖掉即可。 */
+page {
+  background: #000000;
+  color: #FFFFFF;
+  font-size: 28rpx;
+  line-height: 1.5;
+}
+
+/* ---- 配色主题 ----
+   跟着点亮省份数走，档位定义在 themes.js，这里是页面侧的对应实现。
+   canvas 的颜色在 JS、页面的颜色在这儿，没法共用一份，只能靠 t1…t5 这个 key 对齐 ——
+   改 themes.js 记得同步改这里。
+
+   只有带主色的地方跟着变（数字、胶囊选中态、主按钮、中性文字）。
+   面板底和胶囊未选中态是 #0B0F1A 那种近黑色，那个深度下的蓝味看不出来，
+   五档共用一套，省掉一大堆重复规则。 */
+.root {
+  --lit: #2B6BFF;
+  --lit-hi: #6C9BFF;
+  --chip-from: #4A83FF;
+  --chip-to: #1B4FD6;
+  --glow-strong: rgba(43, 107, 255, 0.65);
+  --glow: rgba(43, 107, 255, 0.45);
+  --glow-soft: rgba(43, 107, 255, 0.32);
+  --ink2: #8A99BC;
+  --ink3: #4A5673;
+  --edge: #141C33;
+}
+.root.t2 {
+  --lit: #00C4B4;
+  --lit-hi: #5FE6D9;
+  --chip-from: #2ADBC9;
+  --chip-to: #018E82;
+  --glow-strong: rgba(0, 196, 180, 0.65);
+  --glow: rgba(0, 196, 180, 0.45);
+  --glow-soft: rgba(0, 196, 180, 0.32);
+  --ink2: #7FA6AE;
+  --ink3: #44636B;
+  --edge: #10262D;
+}
+.root.t3 {
+  --lit: #FFB020;
+  --lit-hi: #FFD070;
+  --chip-from: #FFC24E;
+  --chip-to: #D18908;
+  --glow-strong: rgba(255, 176, 32, 0.65);
+  --glow: rgba(255, 176, 32, 0.45);
+  --glow-soft: rgba(255, 176, 32, 0.32);
+  --ink2: #B8A183;
+  --ink3: #6E6047;
+  --edge: #2A2013;
+}
+.root.t4 {
+  --lit: #FF5A4E;
+  --lit-hi: #FF9187;
+  --chip-from: #FF7A70;
+  --chip-to: #D63A30;
+  --glow-strong: rgba(255, 90, 78, 0.65);
+  --glow: rgba(255, 90, 78, 0.45);
+  --glow-soft: rgba(255, 90, 78, 0.32);
+  --ink2: #C0908E;
+  --ink3: #74504F;
+  --edge: #2B1516;
+}
+.root.t5 {
+  --lit: #A855F7;
+  --lit-hi: #D8B4FE;
+  --chip-from: #BC7BFF;
+  --chip-to: #7C2FD0;
+  --glow-strong: rgba(168, 85, 247, 0.65);
+  --glow: rgba(168, 85, 247, 0.45);
+  --glow-soft: rgba(168, 85, 247, 0.32);
+  --ink2: #A995C4;
+  --ink3: #665578;
+  --edge: #1F1533;
+}
+
+/* padding-top 由 js 按胶囊位置算好写进内联 style */
+.app {
+  padding: 0 32rpx 96rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 44rpx;
+}
+
+/* 自绘返回键，和右上角胶囊同一水平线 */
+.navback {
+  position: fixed;
+  left: 16rpx;
+  z-index: 10;
+  width: 72rpx;
+  text-align: center;
+  font-size: 52rpx;
+  color: var(--ink2);
+}
+
+/* ---- 标题 ---- */
+.masthead {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12rpx;
+  text-align: center;
+}
+.title {
+  font-size: 60rpx;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  /* 抵消末字右侧的字距，保持真正居中 */
+  text-indent: 0.14em;
+}
+.kicker {
+  font-size: 25rpx;
+  letter-spacing: 0.04em;
+  color: var(--ink3);
+}
+
+/* ---- 计数板 ---- */
+.scoreboard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20rpx;
+  padding: 40rpx 32rpx;
+  border: 1rpx solid var(--edge);
+  border-radius: 28rpx;
+  background: linear-gradient(180deg, #080C18 0%, #04060C 100%);
+}
+.score-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  font-size: 34rpx;
+  color: var(--ink2);
+}
+.score-num {
+  font-size: 104rpx;
+  font-weight: 800;
+  line-height: 0.9;
+  color: var(--lit-hi);
+  margin: 0 20rpx;
+  text-shadow: 0 0 52rpx var(--glow-strong);
+}
+.score-sub {
+  display: flex;
+  align-items: baseline;
+  font-size: 30rpx;
+  color: var(--ink2);
+}
+.score-area {
+  font-size: 48rpx;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-left: 12rpx;
+}
+.hairline {
+  width: 300rpx;
+  height: 1rpx;
+  background: var(--edge);
+  margin: 4rpx 0;
+}
+.score-egg {
+  display: flex;
+  align-items: center;
+  font-size: 26rpx;
+  color: var(--ink3);
+}
+.score-egg-num {
+  color: var(--ink2);
+  font-weight: 700;
+  margin: 0 8rpx;
+}
+.mark {
+  color: var(--lit);
+  font-size: 22rpx;
+  margin-left: 12rpx;
+}
+
+/* ---- 地图 ---- */
+.mapwrap {
+  margin: 0 -32rpx;
+}
+.map {
+  display: block;
+}
+
+/* ---- 省份按钮 ---- */
+/* 固定 5 列：34 个省名最长三个字，5 列在 375pt 屏上刚好不折字 */
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+.chip {
+  width: calc((100% - 64rpx) / 5);
+  padding: 18rpx 4rpx;
+  box-sizing: border-box;
+  text-align: center;
+  font-size: 26rpx;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--ink3);
+  border: 1rpx solid var(--edge);
+  border-radius: 999rpx;
+  background: linear-gradient(180deg, #161C2B 0%, #0B0F1A 100%);
+  white-space: nowrap;
+  transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+.chip.on {
+  color: #FFFFFF;
+  border-color: var(--lit-hi);
+  background: linear-gradient(180deg, var(--chip-from) 0%, var(--chip-to) 100%);
+  box-shadow: 0 0 32rpx var(--glow);
+}
+
+/* ---- 操作区 ---- */
+.actions {
+  display: flex;
+  flex-direction: column;
+}
+.btn {
+  padding: 28rpx 24rpx;
+  border-radius: 24rpx;
+  text-align: center;
+  font-size: 30rpx;
+  font-weight: 700;
+  border: 1rpx solid var(--edge);
+  background: #0B0F1A;
+  color: var(--ink2);
+}
+.btn + .btn {
+  margin-top: 20rpx;
+}
+.btn.primary {
+  border-color: transparent;
+  background: linear-gradient(180deg, var(--chip-from) 0%, var(--chip-to) 100%);
+  color: #FFFFFF;
+  box-shadow: 0 12rpx 48rpx var(--glow-soft);
+}
+.btn:active {
+  opacity: 0.75;
+}
+
+.note {
+  font-size: 22rpx;
+  color: var(--ink3);
+  text-align: center;
+  line-height: 1.7;
+}
+
+/* ---- 出图预览层 ---- */
+.sheet {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.92);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40rpx;
+  box-sizing: border-box;
+}
+/* 长图是 9:16，按高度锁死宽度，省得 aspectFit 留出上下黑边 */
+.shot {
+  height: 66vh;
+  width: 37.125vh;
+  max-width: 84vw;
+  border-radius: 24rpx;
+  border: 1rpx solid var(--edge);
+}
+.sheet .tip {
+  margin-top: 28rpx;
+  font-size: 26rpx;
+  color: var(--ink2);
+  text-align: center;
+  line-height: 1.7;
+}
+.sheet-actions {
+  margin-top: 28rpx;
+  display: flex;
+}
+.sheet-actions .btn {
+  padding: 22rpx 44rpx;
+}
+.sheet-actions .btn + .btn {
+  margin-top: 0;
+  margin-left: 20rpx;
+}
+
+/* ---- 出图画布：必须是真实节点，挪到屏幕外 ---- */
+.poster {
+  position: fixed;
+  left: -10000px;
+  top: 0;
+  pointer-events: none;
+}
+
+/* ---- toast ---- */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 68rpx;
+  transform: translate(-50%, 28rpx);
+  z-index: 60;
+  padding: 22rpx 40rpx;
+  border-radius: 999rpx;
+  background: #111827;
+  border: 1rpx solid var(--edge);
+  color: #FFFFFF;
+  font-size: 28rpx;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+.toast.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
