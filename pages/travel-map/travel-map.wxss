@@ -292,6 +292,341 @@ page {
   margin-left: 20rpx;
 }
 
+/* 4:5 朋友圈图：按宽度锁死 */
+.shot.feed {
+  width: 72vw;
+  height: 90vw;
+  max-width: 84vw;
+}
+.shot.story {
+  height: 54vh;
+  width: 30.375vh;
+}
+.shot-wait {
+  background: #05070D;
+}
+
+/* ---- 署名 ---- */
+.nick {
+  margin-top: 24rpx;
+  width: 600rpx;
+  display: flex;
+  align-items: center;
+  padding: 14rpx 24rpx;
+  border: 1rpx solid var(--edge);
+  border-radius: 20rpx;
+  background: #0B0F1A;
+  box-sizing: border-box;
+}
+.nick-label {
+  font-size: 26rpx;
+  color: var(--ink2);
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+.nick-input {
+  flex: 1;
+  font-size: 28rpx;
+  color: #FFFFFF;
+}
+.nick-ph {
+  color: var(--ink3);
+  font-size: 24rpx;
+}
+
+/* ---- 好友对比 ---- */
+.friend {
+  display: flex;
+  flex-direction: column;
+  gap: 14rpx;
+  padding: 28rpx 32rpx;
+  border: 1rpx solid var(--lit);
+  border-radius: 28rpx;
+  background: #070B16;
+}
+.friend-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 30rpx;
+  color: #FFFFFF;
+}
+.friend-num {
+  font-size: 44rpx;
+  font-weight: 800;
+  color: var(--lit-hi);
+  margin: 0 6rpx;
+}
+.friend-x {
+  font-size: 40rpx;
+  color: var(--ink3);
+  padding: 0 8rpx;
+}
+.friend-sub {
+  font-size: 25rpx;
+  color: var(--ink2);
+}
+.friend-em {
+  color: #FFFFFF;
+  font-weight: 700;
+}
+.friend-btn {
+  align-self: flex-start;
+  margin-top: 6rpx;
+  padding: 12rpx 28rpx;
+  border-radius: 999rpx;
+  border: 1rpx dashed var(--lit-hi);
+  font-size: 25rpx;
+  color: var(--lit-hi);
+}
+.friend-btn.on {
+  border-style: solid;
+  background: var(--glow-soft);
+  color: #FFFFFF;
+}
+
+/* ---- 计数板附加行 ---- */
+.score-dot {
+  margin: 0 16rpx;
+  color: var(--ink3);
+}
+.score-city {
+  font-size: 60rpx;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-right: 10rpx;
+}
+.score-gap {
+  display: inline-block;
+  width: 36rpx;
+}
+.persona {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--lit-hi);
+}
+.score-extra {
+  font-size: 24rpx;
+  color: var(--ink3);
+  text-align: center;
+}
+
+/* ---- 去过 / 想去 切换 ---- */
+.seg {
+  display: flex;
+  align-self: center;
+  padding: 6rpx;
+  border: 1rpx solid var(--edge);
+  border-radius: 999rpx;
+  background: #0B0F1A;
+}
+.seg-item {
+  padding: 12rpx 44rpx;
+  border-radius: 999rpx;
+  font-size: 27rpx;
+  font-weight: 600;
+  color: var(--ink3);
+}
+.seg-item.on {
+  color: #FFFFFF;
+  background: linear-gradient(180deg, var(--chip-from) 0%, var(--chip-to) 100%);
+}
+.seg-sm {
+  margin-bottom: 16rpx;
+}
+.seg-fmt {
+  margin-bottom: 24rpx;
+}
+.seg-item.off {
+  opacity: 0.35;
+}
+.seg-sm .seg-item {
+  padding: 10rpx 32rpx;
+  font-size: 25rpx;
+}
+
+/* ---- 图例 ---- */
+.legend {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 22rpx;
+  color: var(--ink3);
+  margin-top: 8rpx;
+}
+.lg {
+  display: inline-block;
+  width: 26rpx;
+  height: 16rpx;
+  border-radius: 4rpx;
+  margin: 0 10rpx 0 28rpx;
+}
+.lg-lit {
+  background: var(--lit);
+}
+.lg-mark {
+  border: 2rpx dashed var(--lit-hi);
+  background: var(--glow-soft);
+  box-sizing: border-box;
+}
+
+/* ---- 分区 ---- */
+.regions {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+.region-name {
+  font-size: 22rpx;
+  letter-spacing: 0.1em;
+  color: var(--ink3);
+  margin: 0 0 12rpx 8rpx;
+}
+.chip {
+  position: relative;
+}
+.chip.want {
+  color: var(--lit-hi);
+  border: 1rpx dashed var(--lit-hi);
+}
+/* 城市数角标，压在胶囊右上角，不占胶囊宽度 */
+.chip-n {
+  position: absolute;
+  top: -10rpx;
+  right: -4rpx;
+  min-width: 30rpx;
+  padding: 0 6rpx;
+  box-sizing: border-box;
+  border-radius: 999rpx;
+  background: #FFFFFF;
+  color: #000000;
+  font-size: 18rpx;
+  line-height: 30rpx;
+  font-weight: 700;
+}
+
+/* ---- 细到城市 ---- */
+.drill {
+  border: 1rpx solid var(--edge);
+  border-radius: 28rpx;
+  padding: 24rpx 32rpx 8rpx;
+  background: #05070D;
+}
+.drill-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  margin-bottom: 12rpx;
+}
+.drill-empty {
+  font-size: 24rpx;
+  color: var(--ink3);
+  padding-bottom: 20rpx;
+}
+.drill-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 22rpx 0;
+  border-top: 1rpx solid var(--edge);
+  font-size: 28rpx;
+}
+.drill-n {
+  color: var(--ink3);
+}
+.drill-on {
+  color: var(--lit-hi);
+  font-weight: 700;
+}
+
+/* ---- 城市选择面板 ---- */
+.city-sheet {
+  justify-content: flex-end;
+  padding: 0;
+}
+.panel {
+  width: 100%;
+  max-height: 78vh;
+  display: flex;
+  flex-direction: column;
+  padding: 36rpx 32rpx 56rpx;
+  box-sizing: border-box;
+  border-radius: 32rpx 32rpx 0 0;
+  border-top: 1rpx solid var(--edge);
+  background: #070A12;
+}
+.panel-head {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 24rpx;
+}
+.panel-title {
+  font-size: 36rpx;
+  font-weight: 800;
+}
+.panel-sub {
+  flex: 1;
+  margin-left: 20rpx;
+  font-size: 25rpx;
+  color: var(--ink2);
+}
+.panel-link {
+  font-size: 26rpx;
+  color: var(--lit-hi);
+}
+.panel-body {
+  max-height: 52vh;
+  margin-bottom: 28rpx;
+}
+.city-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+.city {
+  padding: 14rpx 26rpx;
+  border-radius: 999rpx;
+  border: 1rpx solid var(--edge);
+  background: linear-gradient(180deg, #161C2B 0%, #0B0F1A 100%);
+  font-size: 26rpx;
+  color: var(--ink2);
+}
+.city.on {
+  color: #FFFFFF;
+  border-color: var(--lit-hi);
+  background: linear-gradient(180deg, var(--chip-from) 0%, var(--chip-to) 100%);
+}
+
+/* ---- 撤销条 ---- */
+.undo {
+  position: fixed;
+  left: 32rpx;
+  right: 32rpx;
+  bottom: 68rpx;
+  z-index: 61;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx 32rpx;
+  border-radius: 24rpx;
+  background: #111827;
+  border: 1rpx solid var(--edge);
+  font-size: 28rpx;
+  color: #FFFFFF;
+  opacity: 0;
+  transform: translateY(28rpx);
+  pointer-events: none;
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+.undo.show {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.undo-btn {
+  color: var(--lit-hi);
+  font-weight: 700;
+  padding-left: 32rpx;
+}
+
 /* ---- 出图画布：必须是真实节点，挪到屏幕外 ---- */
 .poster {
   position: fixed;

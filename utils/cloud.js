@@ -3,7 +3,7 @@
  */
 const callFunction = async (name, data) => {
   const app = getApp()
-  await app.globalData.cloudReady
+  await app.ensureCloud()
   const cloud = app.globalData.cloud
   return new Promise((resolve, reject) => {
     cloud.callFunction({

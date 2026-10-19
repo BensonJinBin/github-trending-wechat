@@ -28,7 +28,15 @@ const C = {
   ink3: '#4A5673',
   edge: '#141C33',
   sea: '#63769F',
+  /* 下面几个只有浅色样式（明信片）会设，深色时都是 null / false，走默认值 */
+  labelOn: null,     // 点亮省份的省名
+  labelOff: null,    // 未点亮省份的省名
+  labelStroke: null, // 省名描边
+  labelLead: null,   // 有引线的小省点亮后的省名（浅底上白字看不见，要换成主色）
+  noHalo: false,     // 关掉点亮省份的光晕（浅底上光晕会把边缘晕糊）
 }
+
+const LAND_GLOW_DEFAULT = [[16, 0.05], [9, 0.08], [4, 0.10]]
 
 /** 地图上塞不下名字的省份，用引线标到旁边的空白处 */
 const LEAD = {
@@ -55,7 +63,7 @@ function fontSize(id) {
 /** 陆地外发光：给整块陆地（含未点亮的）描一层弱光，把它和纯黑背景分开。
  *  纯黑 + #0A1330 的明度差太小，不加这层，只点亮两三个省时整张图会显得很空。
  *  width 设 0 即关闭。三层递减描边，和点亮省份的光晕同一套做法 */
-const LAND_GLOW = { color: '#2B6BFF', steps: [[16, 0.05], [9, 0.08], [4, 0.10]] }
+const LAND_GLOW = { color: '#2B6BFF', steps: LAND_GLOW_DEFAULT }
 /* 想去掉就把 steps 置成 []。开着更接近「点亮」的调子，也和修掉阴影泄漏之前
    真机上的观感一致 —— 那圈光本来是 bug 漏出来的，这里把它做成可控的 */
 
@@ -106,8 +114,10 @@ function traceMany(ctx, shapes, keep) {
  * @param lit    已点亮省份 id 的 Set
  * @param inset  原始数据里的 inset（南海诸岛）
  * @param x,y,w  在当前坐标系里的落点与宽度，高度按 viewBox 比例走
+ * @param marks  可选，一组「标记但没点亮」的省 id 的 Set（想去 / 好友去过）。
+ *               画成虚线描边加一层淡底，和点亮的实心区分开
  */
-function drawMap(ctx, shapes, lit, inset, x, y, w) {
+function drawMap(ctx, shapes, lit, inset, x, y, w, marks) {
   const s = w / VB[2]
   ctx.save()
   ctx.translate(x, y)
@@ -145,10 +155,24 @@ function drawMap(ctx, shapes, lit, inset, x, y, w) {
   ctx.lineWidth = 1.1
   ctx.stroke()
 
+  // 标记了但没点亮的：淡底 + 虚线。压在点亮层下面，邻省点亮时光晕盖得住它
+  if (marks && marks.size) {
+    traceMany(ctx, shapes, (p) => marks.has(p.id) && !lit.has(p.id))
+    ctx.fillStyle = rgba(C.lit, 0.22)
+    ctx.fill()
+    // 个别老基础库没有 setLineDash，退化成实线描边，也认得出
+    const dash = typeof ctx.setLineDash === 'function'
+    if (dash) ctx.setLineDash([6, 4])
+    ctx.strokeStyle = C.litHi
+    ctx.lineWidth = 1.6
+    ctx.stroke()
+    if (dash) ctx.setLineDash([])
+  }
+
   // 点亮省份：先三层递减描边做光晕（比 shadowBlur 跨端可控得多），再填色。
   // 光晕整体压在填色之前画，才不会糊到邻省的亮面上。
   traceMany(ctx, shapes, isOn)
-  const halo = [[10, 0.1], [6, 0.17], [3, 0.3]]
+  const halo = C.noHalo ? [] : [[10, 0.1], [6, 0.17], [3, 0.3]]
   ctx.strokeStyle = C.litHi
   for (let i = 0; i < halo.length; i++) {
     ctx.globalAlpha = halo[i][1]
@@ -185,9 +209,10 @@ function drawMap(ctx, shapes, lit, inset, x, y, w) {
     const lx = L ? L.x : p.cx
     const ly = L ? L.y : p.cy
     ctx.font = '600 ' + fontSize(p.id) + 'px ' + FONT
-    ctx.strokeStyle = 'rgba(0,0,0,.55)'
+    ctx.strokeStyle = C.labelStroke || 'rgba(0,0,0,.55)'
     ctx.strokeText(p.name, lx, ly)
-    ctx.fillStyle = lit.has(p.id) ? C.ink : 'rgba(255,255,255,.40)'
+    ctx.fillStyle = lit.has(p.id) ? (L && C.labelLead ? C.labelLead : C.labelOn || C.ink)
+      : marks && marks.has(p.id) ? 'rgba(255,255,255,.78)' : C.labelOff || 'rgba(255,255,255,.40)'
     ctx.fillText(p.name, lx, ly)
   }
 
@@ -272,9 +297,19 @@ function pickAt(shapes, px, py, canvasW) {
 /**
  * 换配色。C 和 LAND_GLOW 是模块级的可变对象，屏幕地图和导出长图都读它们，
  * 所以这里一改两边一起变 —— 这正是我们要的：不能出现「屏幕是蓝的、导出是金的」。
- * void 和 ink 不动：底永远纯黑，正文永远纯白。
+ *
+ * 浅色样式（applyPaper）会改掉 void/ink 和几个省名颜色，这里**全部复位**，
+ * 否则出完一张明信片，屏幕上的地图就变成米色的了。
  */
 function applyTheme(t) {
+  C.void = '#000000'
+  C.ink = '#FFFFFF'
+  C.labelOn = null
+  C.labelOff = null
+  C.labelStroke = null
+  C.labelLead = null
+  C.noHalo = false
+  LAND_GLOW.steps = LAND_GLOW_DEFAULT
   C.lit = t.lit
   C.litHi = t.litHi
   C.dim = t.dim
@@ -286,4 +321,18 @@ function applyTheme(t) {
   LAND_GLOW.color = t.lit
 }
 
-module.exports = { VB, INSET, FONT, C, LAND_GLOW, applyTheme, rgba, LEAD, BIG, SMALL, fontSize, roundRect, drawMap, pickAt }
+/** 浅色明信片配色：米白纸、印章红。只给出图用，画完必须 applyTheme 复位 */
+const PAPER = {
+  void: '#F3EEE4', lit: '#C8442F', litHi: '#E0705C',
+  dim: '#E6DDCC', dimLine: '#C7B89E',
+  ink: '#2A2420', ink2: '#6E6255', ink3: '#A3967F', edge: '#D8CDB8', sea: '#A3967F',
+  labelOn: '#FFFFFF', labelOff: 'rgba(60,48,36,.55)', labelStroke: 'rgba(0,0,0,0)', labelLead: '#C8442F',
+  noHalo: true,
+}
+
+function applyPaper() {
+  Object.keys(PAPER).forEach((k) => { C[k] = PAPER[k] })
+  LAND_GLOW.steps = []
+}
+
+module.exports = { VB, INSET, FONT, C, LAND_GLOW, PAPER, applyTheme, applyPaper, rgba, LEAD, BIG, SMALL, fontSize, roundRect, drawMap, pickAt }

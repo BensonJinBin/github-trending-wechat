@@ -14,11 +14,41 @@
     <view class="kicker">点地图，或点下方按钮，点亮你去过的地方</view>
   </view>
 
+  <!-- 好友分享进来时才有：TA 的记录和你的对比 -->
+  <view wx:if="{{friend}}" class="friend">
+    <view class="friend-head">
+      <text>好友点亮了 <text class="friend-num">{{friend.n}}</text> 个省</text>
+      <text class="friend-x" bindtap="onFriendClose">×</text>
+    </view>
+    <view class="friend-sub" wx:if="{{count}}">
+      你们都去过 <text class="friend-em">{{friend.both}}</text> 个 · TA 去过而你没去过 <text class="friend-em">{{friend.onlyThem}}</text> 个
+    </view>
+    <view class="friend-sub" wx:else>你去过几个？点亮自己的地图就能对比</view>
+    <view class="friend-btn {{friend.showing ? 'on' : ''}}" bindtap="onFriendToggle">
+      {{friend.showing ? '收起 TA 的足迹' : '在地图上看 TA 的足迹（虚线）'}}
+    </view>
+  </view>
+
   <view class="scoreboard">
-    <view class="score-row">点亮 <text class="score-num">{{count}}</text> 个省</view>
-    <view class="score-sub">覆盖国土面积 <text class="score-area">{{areaPct}}%</text></view>
+    <view class="score-row">点亮 <text class="score-num">{{count}}</text> 个省<block wx:if="{{cities}}"><text class="score-dot">·</text><text class="score-city">{{cities}}</text> 个城市</block></view>
+    <view class="score-sub">
+      覆盖国土 <text class="score-area">{{areaPct}}%</text>
+      <text class="score-gap"></text>人口 <text class="score-area">{{popPct}}%</text>
+    </view>
+    <view wx:if="{{persona}}" class="persona">{{persona}}</view>
     <view class="hairline"></view>
     <view class="score-egg">超过全国 <text class="score-egg-num">{{peoplePct}}%</text> 的人 <text class="mark">✦</text></view>
+    <view wx:if="{{wantCount || yearNew}}" class="score-extra">
+      <text wx:if="{{wantCount}}">定个目标：想去 {{wantCount}} 个省，已完成 <text class="score-egg-num">{{wantDone}}</text> 个</text>
+      <text wx:if="{{wantCount && yearNew}}">  ·  </text>
+      <text wx:if="{{yearNew}}">{{year}} 年新点亮 <text class="score-egg-num">{{yearNew}}</text> 个</text>
+    </view>
+  </view>
+
+  <!-- 去过 / 想去 两种点选模式 -->
+  <view class="seg">
+    <view class="seg-item {{mode === 'lit' ? 'on' : ''}}" data-mode="lit" bindtap="onModeTap">去过</view>
+    <view class="seg-item {{mode === 'want' ? 'on' : ''}}" data-mode="want" bindtap="onModeTap">想去</view>
   </view>
 
   <!-- 左右出血到屏幕边缘，地图才够大 -->
@@ -31,16 +61,43 @@
       bindtouchstart="onMapTouchStart"
       bindtouchend="onMapTouchEnd"
     ></canvas>
+    <view class="legend">
+      <text class="lg lg-lit"></text>去过
+      <text class="lg lg-mark"></text>{{friend && friend.showing ? 'TA 去过' : '想去'}}
+    </view>
   </view>
 
-  <view class="grid">
+  <!-- 按七大地理分区分组，找起来快 -->
+  <view class="regions">
+    <view class="region" wx:for="{{regions}}" wx:for-item="r" wx:key="name">
+      <view class="region-name">{{r.name}}</view>
+      <view class="grid">
+        <view
+          wx:for="{{r.chips}}"
+          wx:key="id"
+          class="chip {{litMap[item.id] ? 'on' : ''}} {{!litMap[item.id] && wantMap[item.id] ? 'want' : ''}}"
+          data-id="{{item.id}}"
+          bindtap="onChipTap"
+          bindlongpress="onChipLongPress"
+        >{{item.name}}<text wx:if="{{cityNum[item.id]}}" class="chip-n">{{cityNum[item.id]}}</text></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 细到城市：点亮了、有城市数据的省才出现 -->
+  <view class="drill">
+    <view class="drill-title">细到城市</view>
+    <view wx:if="{{!drill.length}}" class="drill-empty">先点亮省份，再在这里选去过的城市（也可以长按省份按钮）</view>
     <view
-      wx:for="{{chips}}"
+      wx:for="{{drill}}"
       wx:key="id"
-      class="chip {{litMap[item.id] ? 'on' : ''}}"
+      class="drill-row"
       data-id="{{item.id}}"
-      bindtap="onChipTap"
-    >{{item.name}}</view>
+      bindtap="onDrillTap"
+    >
+      <text class="drill-name">{{item.name}}</text>
+      <text class="drill-n"><text class="{{item.n ? 'drill-on' : ''}}">{{item.n}}</text> / {{item.total}}  ›</text>
+    </view>
   </view>
 
   <view class="actions">
@@ -49,20 +106,74 @@
   </view>
 
   <view class="note">
-    <view>省界数据来自阿里 DataV.GeoAtlas，含 34 个省级行政区与南海诸岛。</view>
-    <view>国土面积覆盖率按各省公布陆地面积计算；「超过全国 X% 的人」为趣味估算，非统计数据。</view>
+    <view>省界与城市数据来自阿里 DataV.GeoAtlas，含 34 个省级行政区与南海诸岛。</view>
+    <view>国土覆盖率按各省公布陆地面积计算；人口覆盖率按第七次全国人口普查常住人口计算；</view>
+    <view>「超过全国 X% 的人」为趣味估算，非统计数据。</view>
+    <view>记录只存在这台手机上。</view>
+  </view>
+</view>
+
+<!-- 城市选择 -->
+<view class="sheet city-sheet" wx:if="{{city}}" bindtap="onCityClose">
+  <view class="panel" catchtap="onSheetStop">
+    <view class="panel-head">
+      <text class="panel-title">{{city.name}}</text>
+      <text class="panel-sub">去过 {{city.count}} / {{city.list.length}}</text>
+      <text class="panel-link" bindtap="onCityAll">{{city.count == city.list.length ? '全不选' : '全选'}}</text>
+    </view>
+    <scroll-view scroll-y class="panel-body">
+      <view class="city-grid">
+        <view
+          wx:for="{{city.list}}"
+          wx:key="n"
+          class="city {{item.on ? 'on' : ''}}"
+          data-n="{{item.n}}"
+          bindtap="onCityTap"
+        >{{item.n}}</view>
+      </view>
+    </scroll-view>
+    <view class="btn primary" bindtap="onCityClose">完成</view>
   </view>
 </view>
 
 <!-- 出图预览 -->
 <view class="sheet" wx:if="{{sheetOpen}}" bindtap="onCloseSheet">
+  <view class="seg seg-sm" catchtap="onSheetStop">
+    <view
+      wx:for="{{styles}}"
+      wx:key="key"
+      class="seg-item {{style === item.key ? 'on' : ''}}"
+      data-s="{{item.key}}"
+      bindtap="onStyleTap"
+    >{{item.name}}</view>
+  </view>
+  <view class="seg seg-sm seg-fmt" catchtap="onSheetStop">
+    <view class="seg-item {{format === 'story' || !feedOk ? 'on' : ''}}" data-f="story" bindtap="onFormatTap">长图 9:16</view>
+    <view class="seg-item {{format === 'feed' && feedOk ? 'on' : ''}} {{feedOk ? '' : 'off'}}" data-f="feed" bindtap="onFormatTap">朋友圈 4:5</view>
+  </view>
   <image
-    class="shot"
+    wx:if="{{posterPath}}"
+    class="shot {{feedOk ? format : 'story'}}"
     src="{{posterPath}}"
     mode="aspectFit"
     show-menu-by-longpress
     catchtap="onSheetStop"
   ></image>
+  <view wx:else class="shot {{feedOk ? format : 'story'}} shot-wait" catchtap="onSheetStop"></view>
+  <view class="nick" catchtap="onSheetStop">
+    <text class="nick-label">署名</text>
+    <input
+      class="nick-input"
+      value="{{nick}}"
+      maxlength="{{nickMax}}"
+      placeholder="可选，会写进图的标题"
+      placeholder-class="nick-ph"
+      confirm-type="done"
+      bindinput="onNickInput"
+      bindblur="onNickDone"
+      bindconfirm="onNickDone"
+    />
+  </view>
   <view class="tip" catchtap="onSheetStop">长按图片可直接发给朋友，或存到相册再发朋友圈</view>
   <view class="sheet-actions" catchtap="onSheetStop">
     <view class="btn primary" bindtap="onSave">保存到相册</view>
@@ -71,13 +182,18 @@
 </view>
 
 <!-- 出图用的画布。离屏 canvas 不能喂给 canvasToTempFilePath，
-     只能放一个真实节点挪到屏幕外 -->
+     只能放一个真实节点挪到屏幕外；尺寸跟着版式变 -->
 <canvas
   type="2d"
   id="poster"
   class="poster"
   style="width:{{posterW}}px;height:{{posterH}}px"
 ></canvas>
+
+<view class="undo {{undoShow ? 'show' : ''}}">
+  <text>{{undoText}}</text>
+  <text class="undo-btn" bindtap="onUndo">撤销</text>
+</view>
 
 <view class="toast {{toastShow ? 'show' : ''}}">{{toastText}}</view>
 
